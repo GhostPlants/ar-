@@ -1,0 +1,119 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class MainScript : MonoBehaviour {
+
+
+    public GameObject GamePannel;
+    public GameObject TargetPos;
+    public GameObject UIbutton;
+    public GameObject BoxUI;
+
+    public Vector3 pos;
+
+    private bool FindObjState = false;
+
+    public int SamplingNumber = 10;
+
+    private int NumCount = 0;
+    private int MovCount = 0;
+    private float X_dev = 0;
+    private float Y_dev = 0;
+    private float Z_dev = 0;
+
+    private Vector3 MoveIndex; 
+    #region  缓动
+
+
+    //private int NumCount = 0;
+    //private float X_dev = 0;
+    //private float Y_dev = 0;
+    //private float Z_dev = 0;
+    // Use this for initialization
+
+    //if (FindObjState)
+    //{
+    //    NumCount += 1;
+    //    X_dev = GamePannel.transform.position.x - TargetPos.transform.position.x + X_dev;
+    //    Y_dev = GamePannel.transform.position.y - TargetPos.transform.position.y + Y_dev;
+    //    Z_dev = GamePannel.transform.position.z - TargetPos.transform.position.z + Z_dev;
+    //    if (NumCount >= 10)
+    //    {
+    //        if (Math.Abs(X_dev) > 1 || Math.Abs(Y_dev) > 1 || Math.Abs(Z_dev) > 1)
+    //        {
+    //            Vector3 new_pos = new Vector3(GamePannel.transform.position.x  + X_dev, GamePannel.transform.position.y +Y_dev, GamePannel.transform.position.z +Z_dev);
+    //            GamePannel.transform.position = new_pos;
+    //            //iTween.MoveTo(GamePannel, iTween.Hash("position", new_pos, "time", 0.2, "islocal" , true));
+    //        }
+    //    }
+    //}
+
+    #endregion
+
+    void Start() {
+
+
+
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        DelayMove();
+        //var a = -(int)TargetPos.transform.localPosition.x + TargetPos.transform.localPosition.x ;
+        //var b = -(int)TargetPos.transform.localPosition.y +TargetPos.transform.localPosition.y ;
+        //var c = -(int)TargetPos.transform.localPosition.z +TargetPos.transform.localPosition.z;
+        //GamePannel.transform.rotation = TargetPos.transform.rotation;
+        //GamePannel.transform.localPosition = new Vector3(a,b,c);
+        //UIbutton.transform.rotation = Quaternion.Euler(-TargetPos.transform.localRotation.x, -TargetPos.transform.localRotation.y, -TargetPos.transform.localRotation.z);
+    }
+
+    public void SetPannelActive(bool Istrue)
+    {
+        FindObjState = Istrue;
+        GamePannel.SetActive(Istrue);
+        UIbutton.SetActive(Istrue);
+    }
+
+    void DelayMove()
+    {
+
+        if (FindObjState)
+        {
+            Debug.Log("true");
+           NumCount += 1;
+
+           X_dev = TargetPos.transform.localPosition.x  - GamePannel.transform.localPosition.x + X_dev;
+
+           Y_dev = TargetPos.transform.localPosition.y - GamePannel.transform.localPosition.y  + Y_dev;
+
+           Z_dev = TargetPos.transform.localPosition.z - GamePannel.transform.localPosition.z  + Z_dev;
+            if (NumCount >= SamplingNumber)
+            {
+                NumCount = 0;
+                Debug.Log("x :" + X_dev + "  y :" + Y_dev + "  z :" + Z_dev);
+                MoveIndex = new Vector3(X_dev / (float) Math.Pow(SamplingNumber, 2), Y_dev / (float)Math.Pow(SamplingNumber, 2), Z_dev/ (float)Math.Pow(SamplingNumber, 2));
+                X_dev = 0;
+                Y_dev = 0;
+                Z_dev = 0;
+                MovCount = SamplingNumber;
+               //if (Math.Abs(X_dev) > 1 || Math.Abs(Y_dev) > 1 || Math.Abs(Z_dev) > 1)
+               //{
+               //    Vector3 new_pos = new Vector3(GamePannel.transform.position.x + X_dev, GamePannel.transform.position.y + Y_dev, GamePannel.transform.position.z + Z_dev);
+               //    GamePannel.transform.position = new_pos;
+               //   //iTween.MoveTo(GamePannel, iTween.Hash("position", new_pos, "time", 0.2, "islocal" , true));
+               //}
+            }
+
+            if (Math.Abs(MoveIndex.x) > 0.01 || Math.Abs(MoveIndex.y) > 0.01 || Math.Abs(MoveIndex.z) > 0.01 && MovCount>0)
+            {
+                MovCount -= 1;
+                Vector3 new_pos = new Vector3(GamePannel.transform.localPosition.x + MoveIndex.x, GamePannel.transform.localPosition.y + MoveIndex.y, GamePannel.transform.localPosition.z + MoveIndex.z);
+                GamePannel.transform.localPosition = new_pos;
+            }
+        }
+}
+
+}
